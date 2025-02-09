@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  EventsProject:
+    container_name: EventsProject
+    build:
+      context: .  # Ensure the correct relative path to your Dockerfile
+    ports:
+      - "8085:8089"  # Map host port 8085 to container port 8089
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://dbmysql:3306/db?createDatabaseIfNotExist=true&useSSL=false  # Use the service name for Docker networking
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=12345  # Include the MySQL root password
+    restart: unless-stopped
+    image: omardevops/events-project-app
+    depends_on:
+      - dbmysql
+
+  dbmysql:
+    image: "mysql:5.6"
+    container_name: dbmysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345  # MySQL root password
+      - MYSQL_DATABASE=db  # Create the database on startup
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  db:
